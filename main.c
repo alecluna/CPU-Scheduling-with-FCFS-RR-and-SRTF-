@@ -3,12 +3,7 @@
 #include <math.h>
 
 #define FILE_IN "input.1.txt"
-
-//compare function for out qsort() function
-int cmpfunc(const void *a, const void *b)
-{
-    return (*(int *)a - *(int *)b);
-}
+#define length 6
 
 int main(void)
 {
@@ -17,7 +12,8 @@ int main(void)
     int systemTime = 0;
     int count = 0;
     char str[256];
-    int arrivalTimeList[15];
+    int arrival[length];
+    int burst[length];
 
     FILE *input_file;
 
@@ -35,19 +31,20 @@ int main(void)
         char *p = strchr(str, '\n');
         if (p)
             *p = 0; // weird hack to remove the trailing newline
+
         if (sscanf(str, "%d %d %d", &process, &arrivalTime, &burstTime) == 3)
         {
-            arrivalTimeList[count] = arrivalTime;
+            arrival[count] = arrivalTime;
+            burst[count] = burstTime;
         }
         count++;
     }
 
-    qsort(arrivalTimeList, count, sizeof(int), cmpfunc);
-    printf("\nAfter sorting the list is: \n");
     for (int n = 0; n < 6; n++)
     {
-        printf("%d ", arrivalTimeList[n]);
+        printf("arrival time: %d, burst time: %d\n", arrival[n], burst[n]);
     }
+
     // while (burstTime >= 0)
     // {
     //     printf("\nCurrent burst time: %d", burstTime);
