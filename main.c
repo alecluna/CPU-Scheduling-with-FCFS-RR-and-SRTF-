@@ -6,12 +6,19 @@
 #define length 6
 typedef struct dataSection
 {
-    int pid;
+    int process;
     int arrival;
     int burst;
+    struct dataSection *next; //reference to next dataSection in LL
 
 } dataSection;
 
+dataSection empty = {
+
+    -1,
+    -1,
+    0,
+    NULL};
 int main(void)
 {
 
@@ -22,6 +29,7 @@ int main(void)
     int arrival[length];
     int burst[length];
     int waitTime[length];
+    dataSection *ptr = NULL;
 
     FILE *input_file;
 
@@ -43,8 +51,12 @@ int main(void)
         if (sscanf(str, "%d %d %d", &process, &arrivalTime, &burstTime) == 3)
         {
 
+            dataSection *temp;
             arrival[count] = arrivalTime;
             burst[count] = burstTime;
+            temp = (dataSection *)malloc(sizeof(dataSection));
+            temp->next = ptr;
+            ptr = temp;
         }
         else
         {
