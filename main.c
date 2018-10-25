@@ -4,6 +4,13 @@
 
 #define FILE_IN "input.1.txt"
 #define length 6
+typedef struct dataSection
+{
+    int pid;
+    int arrival;
+    int burst;
+
+} dataSection;
 
 int main(void)
 {
@@ -14,6 +21,7 @@ int main(void)
     char str[256];
     int arrival[length];
     int burst[length];
+    int waitTime[length];
 
     FILE *input_file;
 
@@ -34,30 +42,61 @@ int main(void)
 
         if (sscanf(str, "%d %d %d", &process, &arrivalTime, &burstTime) == 3)
         {
+
             arrival[count] = arrivalTime;
             burst[count] = burstTime;
         }
+        else
+        {
+            printf("error reading input text, needs to be in a 3 colunm format");
+        }
         count++;
     }
+
+    //  Input the processes along with their burst time (bt).
+    // 2-  Find waiting time (wt) for all processes.
+    // 3-  As first process that comes need not to wait so
+    //     waiting time for process 1 will be 0 i.e. wt[0] = 0.
+    // 4-  Find waiting time for all other processes i.e. for
+    //      process i ->
+    //        wt[i] = bt[i-1] + wt[i-1] .
+    // 5-  Find turnaround time = waiting_time + burst_time
+    //     for all processes.
+    // 6-  Find average waiting time =
+    //                  total_waiting_time / no_of_processes.
+    // 7-  Similarly, find average turnaround time =
+    //                  total_turn_around_time / no_of_processes.
 
     for (int n = 0; n < 6; n++)
     {
         printf("arrival time: %d, burst time: %d\n", arrival[n], burst[n]);
     }
 
-    // while (burstTime >= 0)
-    // {
-    //     printf("\nCurrent burst time: %d", burstTime);
-    //     printf("\n<System Time     %d>", systemTime);
-    //     burstTime--;
-    //     //go to next process
-    //     if (burstTime == 0)
-    //     {
-    //         printf("\nCurrent burst time: %d", burstTime);
-    //         printf("\n<System Time     %d>", systemTime);
-    //         printf("\n****switch to next process");
-    //     }
-    // }
+    for (int i = 0; i < length; i++)
+    {
+
+        arrivalTime = arrival[i];
+        burstTime = burst[i];
+        process = 0;
+        while (burstTime >= 0)
+        {
+            if (burstTime == 0)
+            {
+                printf("\nCurrent burst time: %d", burstTime);
+                printf("\n<System Time     %d>", systemTime);
+                printf("\n****switch to next process");
+                break;
+            }
+            else
+            {
+                printf("\nCurrent burst time: %d", burstTime);
+                printf("\n<System Time     %d>", systemTime);
+            }
+            burstTime--;
+            systemTime++;
+        }
+        process++;
+    }
 
     fclose(input_file);
     return EXIT_SUCCESS;
