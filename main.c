@@ -9,16 +9,11 @@ typedef struct dataSection
     int process;
     int arrival;
     int burst;
-    struct dataSection *next; //reference to next dataSection in LL
+    struct dataSection *next; //reference to next dataSection node in LL
 
 } dataSection;
 
-dataSection empty = {
-
-    -1,
-    -1,
-    0,
-    NULL};
+dataSection empty = {-1, -1, 0, NULL}; //initialize our empty struct
 int main(void)
 {
 
@@ -51,18 +46,20 @@ int main(void)
         if (sscanf(str, "%d %d %d", &process, &arrivalTime, &burstTime) == 3)
         {
 
-            dataSection *temp;
-            arrival[count] = arrivalTime;
-            burst[count] = burstTime;
-            temp = (dataSection *)malloc(sizeof(dataSection));
-            temp->next = ptr;
+            dataSection *temp;                                 //need a temp pointer to reference the next dataSection
+            temp = (dataSection *)malloc(sizeof(dataSection)); //otherwise we'd overwrite the current ptr's dataSection
+            temp->next = ptr;                                  //increment our linked list
             ptr = temp;
+            ptr->process = process; //assign necessary variables
+            ptr->arrival = arrivalTime;
+            ptr->burst = burstTime;
+
+            printf("%d %d %d\n", ptr->process, ptr->arrival, ptr->burst);
         }
         else
         {
             printf("error reading input text, needs to be in a 3 colunm format");
         }
-        count++;
     }
 
     //  Input the processes along with their burst time (bt).
@@ -79,36 +76,36 @@ int main(void)
     // 7-  Similarly, find average turnaround time =
     //                  total_turn_around_time / no_of_processes.
 
-    for (int n = 0; n < 6; n++)
-    {
-        printf("arrival time: %d, burst time: %d\n", arrival[n], burst[n]);
-    }
+    // for (int n = 0; n < 6; n++)
+    // {
+    //     printf("arrival time: %d, burst time: %d\n", arrival[n], burst[n]);
+    // }
 
-    for (int i = 0; i < length; i++)
-    {
+    // for (int i = 0; i < length; i++)
+    // {
 
-        arrivalTime = arrival[i];
-        burstTime = burst[i];
-        process = 0;
-        while (burstTime >= 0)
-        {
-            if (burstTime == 0)
-            {
-                printf("\nCurrent burst time: %d", burstTime);
-                printf("\n<System Time     %d>", systemTime);
-                printf("\n****switch to next process");
-                break;
-            }
-            else
-            {
-                printf("\nCurrent burst time: %d", burstTime);
-                printf("\n<System Time     %d>", systemTime);
-            }
-            burstTime--;
-            systemTime++;
-        }
-        process++;
-    }
+    //     arrivalTime = arrival[i];
+    //     burstTime = burst[i];
+    //     process = 0;
+    //     while (burstTime >= 0)
+    //     {
+    //         if (burstTime == 0)
+    //         {
+    //             printf("\nCurrent burst time: %d", burstTime);
+    //             printf("\n<System Time     %d>", systemTime);
+    //             printf("\n****switch to next process");
+    //             break;
+    //         }
+    //         else
+    //         {
+    //             printf("\nCurrent burst time: %d", burstTime);
+    //             printf("\n<System Time     %d>", systemTime);
+    //         }
+    //         burstTime--;
+    //         systemTime++;
+    //     }
+    //     process++;
+    //}
 
     fclose(input_file);
     return EXIT_SUCCESS;
