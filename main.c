@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #define FILE_IN "input.1.txt"
-#define length 6
+#define length 20
 typedef struct dataSection
 {
     int process;
@@ -14,15 +15,14 @@ typedef struct dataSection
 } dataSection;
 
 dataSection empty = {-1, -1, 0, NULL}; //initialize our empty struct
-int main(void)
+int main(int argc, char *argv[])
 {
 
     int process, arrivalTime, burstTime;
     int systemTime = 0;
     int count = 0;
     char str[256];
-    int arrival[length];
-    int burst[length];
+
     int waitTime[length];
     dataSection *ptr = NULL;
 
@@ -36,8 +36,8 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    //read input file first
-    while (fgets(str, sizeof str, input_file))
+    waitTime[0] = 0;                           //initialize first wait time
+    while (fgets(str, sizeof str, input_file)) //read input file
     {
         char *p = strchr(str, '\n');
         if (p)
@@ -55,6 +55,52 @@ int main(void)
             ptr->burst = burstTime;
 
             printf("%d %d %d\n", ptr->process, ptr->arrival, ptr->burst);
+
+            if (strcmp(argv[1], "FCFS") == 0)
+            {
+
+                //  Input the processes along with their burst time (bt).
+                // 2-  Find waiting time (wt) for all processes.
+                // 3-  As first process that comes need not to wait so
+                //     waiting time for process 1 will be 0 i.e. wt[0] = 0.
+                // 4-  Find waiting time for all other processes i.e. for
+                //      process i ->
+                //        wt[i] = bt[i-1] + wt[i-1] .
+                // 5-  Find turnaround time = waiting_time + burst_time
+                //     for all processes.
+                // 6-  Find average waiting time =
+                //                  total_waiting_time / no_of_processes.
+                // 7-  Similarly, find average turnaround time =
+                //                  total_turn_around_time / no_of_processes.
+                int tempBurstTime = burstTime;
+                while (tempBurstTime >= 0)
+                {
+                    if (tempBurstTime == 0)
+                    {
+                        printf("\n<System Time %d> process %d is finished!\n", systemTime, ptr->process);
+                        break;
+                    }
+                    else
+                    {
+                        printf("\n<System Time %d> process %d is running...\n", systemTime, ptr->process);
+                        tempBurstTime--;
+                    }
+                    systemTime++;
+                }
+            }
+            else if (strcmp(argv[1], "RR") == 0)
+            {
+
+                printf("RR algo %s\n", argv[1]);
+            }
+            else if (strcmp(argv[1], "SJF") == 0)
+            {
+                printf("SJF algo %s\n", argv[1]);
+            }
+            else
+            {
+                perror("Error with input");
+            }
         }
         else
         {
@@ -62,30 +108,9 @@ int main(void)
         }
     }
 
-    //  Input the processes along with their burst time (bt).
-    // 2-  Find waiting time (wt) for all processes.
-    // 3-  As first process that comes need not to wait so
-    //     waiting time for process 1 will be 0 i.e. wt[0] = 0.
-    // 4-  Find waiting time for all other processes i.e. for
-    //      process i ->
-    //        wt[i] = bt[i-1] + wt[i-1] .
-    // 5-  Find turnaround time = waiting_time + burst_time
-    //     for all processes.
-    // 6-  Find average waiting time =
-    //                  total_waiting_time / no_of_processes.
-    // 7-  Similarly, find average turnaround time =
-    //                  total_turn_around_time / no_of_processes.
-
-    // for (int n = 0; n < 6; n++)
-    // {
-    //     printf("arrival time: %d, burst time: %d\n", arrival[n], burst[n]);
-    // }
-
     // for (int i = 0; i < length; i++)
     // {
 
-    //     arrivalTime = arrival[i];
-    //     burstTime = burst[i];
     //     process = 0;
     //     while (burstTime >= 0)
     //     {
@@ -105,7 +130,7 @@ int main(void)
     //         systemTime++;
     //     }
     //     process++;
-    //}
+    // }
 
     fclose(input_file);
     return EXIT_SUCCESS;
