@@ -4,7 +4,7 @@
 #include <string.h>
 
 #define FILE_IN "input.1.txt"
-#define length 20
+#define length 6
 
 typedef struct dataSection
 {
@@ -63,23 +63,25 @@ void findWaitingTime(int processList[], int size,
                      int burstTimeList[], int waitTimeList[])
 {
     // waiting time for first process is 0
-    int total_wt = 0;
+    int totalWaitTime = 0;
     waitTimeList[0] = 0;
 
     // calculating waiting time
     for (int i = 1; i < size; i++){
         waitTimeList[i] = burstTimeList[i - 1] + waitTimeList[i - 1];
-        total_wt = total_wt + waitTimeList[i];  
+        totalWaitTime = totalWaitTime + waitTimeList[i];  
+        printf("Wait time List read inside wait time function: %d\n", waitTimeList[i-1]);
+        printf("%d\n", size);
     }
 }
 
 //Function to calculate average time  
 void findavgTime(int processList[], int size, int burstTimeList[])  
 {  
-    int wt[size], total_wt = 0;  
+    int waitTime[size], totalWaitTime = 0;  
     
     //Function to find waiting time of all processes  
-    findWaitingTime(processList, size, burstTimeList, wt);  
+    findWaitingTime(processList, size, burstTimeList, waitTime);  
     
     printf("Processes   Burst time   Waiting time\n");  
     
@@ -87,13 +89,13 @@ void findavgTime(int processList[], int size, int burstTimeList[])
     // around time  
     for (int  i=0; i<size; i++)  
     {  
-        total_wt = total_wt + wt[i];  
+        totalWaitTime = totalWaitTime + waitTime[i];  
         printf("   %d",(i+1)); 
-        printf("   %d",burstTimeList[i] ); 
-        printf("   %d",wt[i] ); 
+        printf("        %d",burstTimeList[i] ); 
+        printf("            %d\n",waitTime[i] ); 
     }  
-    int s=(float)total_wt / (float)size; 
-    printf("Average waiting time = %d",s); 
+    int averageWaitTime = (float)totalWaitTime / (float)size; 
+    printf("Average waiting time = %d",averageWaitTime); 
     printf("\n"); 
 }  
 int main(int argc, char *argv[])
@@ -103,11 +105,11 @@ int main(int argc, char *argv[])
     int systemTime = 0;
     int count = 0;
     char str[256];
-
-    int waitTimeList[10];
-    int processList[10];
-    int burstTimeList[10];
     dataSection *ptr = NULL;
+
+    int waitTimeList[length];
+    int processList[length];
+    int burstTimeList[length];
 
     FILE *input_file;
 
@@ -179,10 +181,15 @@ int main(int argc, char *argv[])
             printf("error reading input text, needs to be in a 3 colunm format");
         }
     }
-
+    printf("\n");
+    printf("\n");
     //calculate average here
-   int size = sizeof processList / sizeof processList[0];  
+    // for (int i = 0; i < 6; i++){
+    //     printf("Process List array that will be passed into the average time function: %d  %d\n", processList[i],burstTimeList[i]);
+    // }
+    int size = sizeof processList / sizeof processList[0];  
     findavgTime(processList, size, burstTimeList);
+    printf("\n");
     fclose(input_file);
     return EXIT_SUCCESS;
 }
