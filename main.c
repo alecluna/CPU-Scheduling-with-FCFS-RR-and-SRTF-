@@ -5,6 +5,7 @@
 
 #define FILE_IN "input.1.txt"
 #define length 20
+
 typedef struct dataSection
 {
     int process;
@@ -16,59 +17,85 @@ typedef struct dataSection
 
 dataSection empty = {-1, -1, 0, NULL}; //initialize our empty struct
 
-void findWaitingTime(int processes[], int n,
+// // Function to calculate turn around time
+// void findTurnAroundTime(int processes[], int n,
+//                         int burstTimeList[], int waitTimeList[], int turnaroundTime[])
+// {
+//     // calculating turnaround time by adding
+//     // bt[i] + wt[i]
+//     for (int i = 0; i < n; i++)
+//         turnaroundTime[i] = burstTimeList[i] + waitTimeList[i];
+// }
+
+// //Function to calculate average time
+// void findavgTime(int processes[], int n, int burstTimeList[])
+// {
+//     int waitTimeList[n], turnaroundTime[n], total_wt = 0, total_tat = 0;
+
+//     //Function to find waiting time of all processes
+//     findWaitingTime(processes, n, burstTimeList, waitTimeList);
+
+//     //Function to find turn around time for all processes
+//     findTurnAroundTime(processes, n, burstTimeList, waitTimeList, turnaroundTime);
+
+//     //Display processes along with all details
+//     printf("Processes   Burst time   Waiting time   Turn around time\n");
+
+//     // Calculate total waiting time and total turn
+//     // around time
+//     for (int i = 0; i < n; i++)
+//     {
+//         total_wt = total_wt + waitTimeList[i];
+//         total_tat = total_tat + turnaroundTime[i];
+//         printf("   %d ", (i + 1));
+//         printf("       %d ", burstTimeList[i]);
+//         printf("       %d", waitTimeList[i]);
+//         printf("       %d\n", turnaroundTime[i]);
+//     }
+//     int s = (float)total_wt / (float)n;
+//     int t = (float)total_tat / (float)n;
+//     printf("Average waiting time = %d", s);
+//     printf("\n");
+//     printf("Average turn around time = %d ", t);
+// }
+
+void findWaitingTime(int processList[], int size,
                      int burstTimeList[], int waitTimeList[])
 {
     // waiting time for first process is 0
+    int total_wt = 0;
     waitTimeList[0] = 0;
 
     // calculating waiting time
-    for (int i = 1; i < n; i++)
+    for (int i = 1; i < size; i++){
         waitTimeList[i] = burstTimeList[i - 1] + waitTimeList[i - 1];
-}
-
-// Function to calculate turn around time
-void findTurnAroundTime(int processes[], int n,
-                        int burstTimeList[], int waitTimeList[], int turnaroundTime[])
-{
-    // calculating turnaround time by adding
-    // bt[i] + wt[i]
-    for (int i = 0; i < n; i++)
-        turnaroundTime[i] = burstTimeList[i] + waitTimeList[i];
-}
-
-//Function to calculate average time
-void findavgTime(int processes[], int n, int burstTimeList[])
-{
-    int waitTimeList[n], turnaroundTime[n], total_wt = 0, total_tat = 0;
-
-    //Function to find waiting time of all processes
-    findWaitingTime(processes, n, burstTimeList, waitTimeList);
-
-    //Function to find turn around time for all processes
-    findTurnAroundTime(processes, n, burstTimeList, waitTimeList, turnaroundTime);
-
-    //Display processes along with all details
-    printf("Processes   Burst time   Waiting time   Turn around time\n");
-
-    // Calculate total waiting time and total turn
-    // around time
-    for (int i = 0; i < n; i++)
-    {
-        total_wt = total_wt + waitTimeList[i];
-        total_tat = total_tat + turnaroundTime[i];
-        printf("   %d ", (i + 1));
-        printf("       %d ", burstTimeList[i]);
-        printf("       %d", waitTimeList[i]);
-        printf("       %d\n", turnaroundTime[i]);
+        total_wt = total_wt + waitTimeList[i];  
     }
-    int s = (float)total_wt / (float)n;
-    int t = (float)total_tat / (float)n;
-    printf("Average waiting time = %d", s);
-    printf("\n");
-    printf("Average turn around time = %d ", t);
 }
 
+//Function to calculate average time  
+void findavgTime(int processList[], int size, int burstTimeList[])  
+{  
+    int wt[size], total_wt = 0;  
+    
+    //Function to find waiting time of all processes  
+    findWaitingTime(processList, size, burstTimeList, wt);  
+    
+    printf("Processes   Burst time   Waiting time\n");  
+    
+    // Calculate total waiting time and total turn   
+    // around time  
+    for (int  i=0; i<size; i++)  
+    {  
+        total_wt = total_wt + wt[i];  
+        printf("   %d",(i+1)); 
+        printf("   %d",burstTimeList[i] ); 
+        printf("   %d",wt[i] ); 
+    }  
+    int s=(float)total_wt / (float)size; 
+    printf("Average waiting time = %d",s); 
+    printf("\n"); 
+}  
 int main(int argc, char *argv[])
 {
 
@@ -77,7 +104,9 @@ int main(int argc, char *argv[])
     int count = 0;
     char str[256];
 
-    int waitTime[length];
+    int waitTimeList[10];
+    int processList[10];
+    int burstTimeList[10];
     dataSection *ptr = NULL;
 
     FILE *input_file;
@@ -90,7 +119,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    waitTime[0] = 0;                           //initialize first wait time
     while (fgets(str, sizeof str, input_file)) //read input file
     {
         char *p = strchr(str, '\n');
@@ -107,25 +135,15 @@ int main(int argc, char *argv[])
             ptr->process = process; //assign necessary variables
             ptr->arrival = arrivalTime;
             ptr->burst = burstTime;
+            processList[count] = ptr->process;
+            burstTimeList[count] = ptr->burst;
+            count++;
 
             printf("%d %d %d\n", ptr->process, ptr->arrival, ptr->burst);
 
             if (strcmp(argv[1], "FCFS") == 0)
             {
 
-                //  Input the processes along with their burst time (bt).
-                // 2-  Find waiting time (wt) for all processes.
-                // 3-  As first process that comes need not to wait so
-                //     waiting time for process 1 will be 0 i.e. wt[0] = 0.
-                // 4-  Find waiting time for all other processes i.e. for
-                //      process i ->
-                //        wt[i] = bt[i-1] + wt[i-1] .
-                // 5-  Find turnaround time = waiting_time + burst_time
-                //     for all processes.
-                // 6-  Find average waiting time =
-                //                  total_waiting_time / no_of_processes.
-                // 7-  Similarly, find average turnaround time =
-                //                  total_turn_around_time / no_of_processes.
                 int tempBurstTime = burstTime;
                 while (tempBurstTime >= 0)
                 {
@@ -162,30 +180,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    // for (int i = 0; i < length; i++)
-    // {
-
-    //     process = 0;
-    //     while (burstTime >= 0)
-    //     {
-    //         if (burstTime == 0)
-    //         {
-    //             printf("\nCurrent burst time: %d", burstTime);
-    //             printf("\n<System Time     %d>", systemTime);
-    //             printf("\n****switch to next process");
-    //             break;
-    //         }
-    //         else
-    //         {
-    //             printf("\nCurrent burst time: %d", burstTime);
-    //             printf("\n<System Time     %d>", systemTime);
-    //         }
-    //         burstTime--;
-    //         systemTime++;
-    //     }
-    //     process++;
-    // }
-
+    //calculate average here
+   int size = sizeof processList / sizeof processList[0];  
+    findavgTime(processList, size, burstTimeList);
     fclose(input_file);
     return EXIT_SUCCESS;
 }
