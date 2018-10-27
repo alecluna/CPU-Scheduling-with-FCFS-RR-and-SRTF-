@@ -17,86 +17,62 @@ typedef struct dataSection
 
 dataSection empty = {-1, -1, 0, NULL}; //initialize our empty struct
 
-// // Function to calculate turn around time
-// void findTurnAroundTime(int processes[], int n,
-//                         int burstTimeList[], int waitTimeList[], int turnaroundTime[])
-// {
-//     // calculating turnaround time by adding
-//     // bt[i] + wt[i]
-//     for (int i = 0; i < n; i++)
-//         turnaroundTime[i] = burstTimeList[i] + waitTimeList[i];
-// }
-
-// //Function to calculate average time
-// void findavgTime(int processes[], int n, int burstTimeList[])
-// {
-//     int waitTimeList[n], turnaroundTime[n], total_wt = 0, total_tat = 0;
-
-//     //Function to find waiting time of all processes
-//     findWaitingTime(processes, n, burstTimeList, waitTimeList);
-
-//     //Function to find turn around time for all processes
-//     findTurnAroundTime(processes, n, burstTimeList, waitTimeList, turnaroundTime);
-
-//     //Display processes along with all details
-//     printf("Processes   Burst time   Waiting time   Turn around time\n");
-
-//     // Calculate total waiting time and total turn
-//     // around time
-//     for (int i = 0; i < n; i++)
-//     {
-//         total_wt = total_wt + waitTimeList[i];
-//         total_tat = total_tat + turnaroundTime[i];
-//         printf("   %d ", (i + 1));
-//         printf("       %d ", burstTimeList[i]);
-//         printf("       %d", waitTimeList[i]);
-//         printf("       %d\n", turnaroundTime[i]);
-//     }
-//     int s = (float)total_wt / (float)n;
-//     int t = (float)total_tat / (float)n;
-//     printf("Average waiting time = %d", s);
-//     printf("\n");
-//     printf("Average turn around time = %d ", t);
-// }
-
 void findWaitingTime(int processList[], int size,
                      int burstTimeList[], int waitTimeList[])
 {
-    // waiting time for first process is 0
-    int totalWaitTime = 0;
-    waitTimeList[0] = 0;
-
-    // calculating waiting time
-    for (int i = 1; i < size; i++){
+    waitTimeList[0] = 0; //first one to arrive is always 0
+    for (int i = 1; i <= size + 1; i++)
+    {
         waitTimeList[i] = burstTimeList[i - 1] + waitTimeList[i - 1];
-        totalWaitTime = totalWaitTime + waitTimeList[i];  
-        printf("Wait time List read inside wait time function: %d\n", waitTimeList[i-1]);
+        printf("Wait time List read inside wait time function: %d\n", waitTimeList[i - 1]);
         printf("%d\n", size);
     }
 }
 
+void findTurnAroundTime(int processList[], int size,   
+                  int burstTimeList[], int waitTimeList[], int turnAroundTimeList[])  
+{  
+    
+    for (int  i = 0; i < size; i++)  
+        turnAroundTimeList[i] = burstTimeList[i] + waitTimeList[i];  
+}  
+   
+
 //Function to calculate average time  
 void findavgTime(int processList[], int size, int burstTimeList[])  
 {  
-    int waitTime[size], totalWaitTime = 0;  
+    int waitTime[size], turnaroundTimeList[size], total_tat = 0;  
+    int totalWaitTime = 0;
     
-    //Function to find waiting time of all processes  
+    //Function to find waiting time of all processes 
+    printf("\n totalWaitTime before entering function: %d\n", totalWaitTime);
     findWaitingTime(processList, size, burstTimeList, waitTime);  
+    findTurnAroundTime(processList, size, burstTimeList, waitTime, turnaroundTimeList); 
+    printf("\n totalWaitTime after exiting function: %d\n", totalWaitTime);
+
+    for (int  i = 0; i < size; i++)  
+        printf("\n Wait time list after exiting function: %d \n", waitTime[i]); 
     
-    printf("Processes   Burst time   Waiting time\n");  
+    printf("Processes   Burst time   Waiting time  Turnaround Time\n");  
     
     // Calculate total waiting time and total turn   
     // around time  
-    for (int  i=0; i<size; i++)  
+    for (int i=0; i<size; i++)  
     {  
         totalWaitTime = totalWaitTime + waitTime[i];  
+        total_tat = total_tat + turnaroundTimeList[i];  
         printf("   %d",(i+1)); 
         printf("        %d",burstTimeList[i] ); 
-        printf("            %d\n",waitTime[i] ); 
+        printf("            %d",waitTime[i] ); 
+        printf("               %d\n", turnaroundTimeList[i]);
+
     }  
     int averageWaitTime = (float)totalWaitTime / (float)size; 
+    int tat=(float)total_tat / (float)size; 
     printf("Average waiting time = %d",averageWaitTime); 
     printf("\n"); 
+    printf("Average turn around time = %d ",tat);  
+
 }  
 int main(int argc, char *argv[])
 {
