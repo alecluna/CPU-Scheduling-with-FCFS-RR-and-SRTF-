@@ -72,6 +72,10 @@ void findavgTime(int processList[], int size, int burstTimeList[])
     printf("\n");
     printf("Average turn around time = %d ", tat);
 }
+
+void roundRobinAlgo()
+{
+}
 int main(int argc, char *argv[])
 {
 
@@ -138,7 +142,7 @@ int main(int argc, char *argv[])
             }
             else if ((strcmp(argv[2], "RR") == 0) && (atoi(argv[3]) >= 1))
             {
-                int timeQuantum = atoi(argv[2]);
+                int timeQuantum = atoi(argv[3]);
                 int rem_bt[length];
                 //map a new burst time array
                 for (int i = 0; i < length; i++)
@@ -147,62 +151,7 @@ int main(int argc, char *argv[])
                 printf("RR algo %s\n", argv[2]);
                 printf("Time Quantum: %d\n", timeQuantum);
 
-                int t = 0; // Current time
-
-                while (1)
-                {
-                    bool done = true;
-
-                    // Traverse all processes one by one repeatedly
-                    for (int i = 0; i < length; i++)
-                    {
-                        // If burst time of a process is greater than 0
-                        // then only need to process further
-                        if (rem_bt[i] > 0)
-                        {
-                            done = false; // There is a pending process
-
-                            if (rem_bt[i] > t)
-                            {
-                                // Increase the value of t i.e. shows
-                                // how much time a process has been processed
-                                t += timeQuantum;
-
-                                // Decrease the burst_time of current process
-                                // by quantum
-                                rem_bt[i] -= t;
-                                systemTime++;
-                                printf("\n<System Time %d> process %d is running...\n", systemTime, ptr->process);
-                            }
-
-                            // If burst time is smaller than or equal to
-                            // quantum. Last cycle for this process
-                            else
-                            {
-                                // Increase the value of t i.e. shows
-                                // how much time a process has been processed
-                                t = t + rem_bt[i];
-
-                                // Waiting time is current time minus time
-                                // used by this process
-                                waitTimeList[i] = t - burstTimeList[i];
-
-                                // As the process gets fully executed
-                                // make its remaining burst time = 0
-                                rem_bt[i] = 0;
-                                systemTime++;
-                                printf("\n<System Time %d> process %d is finished\n", systemTime, ptr->process);
-                            }
-                        }
-                    }
-
-                    // If all processes are done
-                    if (done == true)
-                    {
-                        printf("done");
-                        break;
-                    }
-                }
+                roundRobinAlgo();
             }
             else if (strcmp(argv[2], "SJF") == 0)
             {
