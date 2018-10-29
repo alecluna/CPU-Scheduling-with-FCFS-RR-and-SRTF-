@@ -5,6 +5,9 @@
 
 #define FILE_IN "input.1.txt"
 #define length 6
+typedef int bool;
+#define true 1
+#define false 0
 
 typedef struct dataSection
 {
@@ -29,51 +32,46 @@ void findWaitingTime(int processList[], int size,
     }
 }
 
-void findTurnAroundTime(int processList[], int size,   
-                  int burstTimeList[], int waitTimeList[], int turnAroundTimeList[])  
-{  
-    
-    for (int  i = 0; i < size; i++)  
-        turnAroundTimeList[i] = burstTimeList[i] + waitTimeList[i];  
-}  
-   
+void findTurnAroundTime(int processList[], int size,
+                        int burstTimeList[], int waitTimeList[], int turnAroundTimeList[])
+{
 
-//Function to calculate average time  
-void findavgTime(int processList[], int size, int burstTimeList[])  
-{  
-    int waitTime[size], turnaroundTimeList[size], total_tat = 0;  
+    for (int i = 0; i < size; i++)
+        turnAroundTimeList[i] = burstTimeList[i] + waitTimeList[i];
+}
+
+//Function to calculate average time
+void findavgTime(int processList[], int size, int burstTimeList[])
+{
+    int waitTime[size], turnaroundTimeList[size], total_tat = 0;
     int totalWaitTime = 0;
-    
-    //Function to find waiting time of all processes 
-    printf("\n totalWaitTime before entering function: %d\n", totalWaitTime);
-    findWaitingTime(processList, size, burstTimeList, waitTime);  
-    findTurnAroundTime(processList, size, burstTimeList, waitTime, turnaroundTimeList); 
-    printf("\n totalWaitTime after exiting function: %d\n", totalWaitTime);
 
-    for (int  i = 0; i < size; i++)  
-        printf("\n Wait time list after exiting function: %d \n", waitTime[i]); 
-    
-    printf("Processes   Burst time   Waiting time  Turnaround Time\n");  
-    
-    // Calculate total waiting time and total turn   
-    // around time  
-    for (int i=0; i<size; i++)  
-    {  
-        totalWaitTime = totalWaitTime + waitTime[i];  
-        total_tat = total_tat + turnaroundTimeList[i];  
-        printf("   %d",(i+1)); 
-        printf("        %d",burstTimeList[i] ); 
-        printf("            %d",waitTime[i] ); 
+    //Function to find waiting time of all processes
+    findWaitingTime(processList, size, burstTimeList, waitTime);
+    findTurnAroundTime(processList, size, burstTimeList, waitTime, turnaroundTimeList);
+
+    for (int i = 0; i < size; i++)
+        printf("\n Wait time list after exiting function: %d \n", waitTime[i]);
+
+    printf("Processes   Burst time   Waiting time  Turnaround Time\n");
+
+    // Calculate total waiting time and total turn
+    // around time
+    for (int i = 0; i < size; i++)
+    {
+        totalWaitTime = totalWaitTime + waitTime[i];
+        total_tat = total_tat + turnaroundTimeList[i];
+        printf("   %d", (i + 1));
+        printf("        %d", burstTimeList[i]);
+        printf("            %d", waitTime[i]);
         printf("               %d\n", turnaroundTimeList[i]);
-
-    }  
-    int averageWaitTime = (float)totalWaitTime / (float)size; 
-    int tat=(float)total_tat / (float)size; 
-    printf("Average waiting time = %d",averageWaitTime); 
-    printf("\n"); 
-    printf("Average turn around time = %d ",tat);  
-
-}  
+    }
+    int averageWaitTime = (float)totalWaitTime / (float)size;
+    int tat = (float)total_tat / (float)size;
+    printf("Average waiting time = %d", averageWaitTime);
+    printf("\n");
+    printf("Average turn around time = %d ", tat);
+}
 int main(int argc, char *argv[])
 {
 
@@ -137,11 +135,67 @@ int main(int argc, char *argv[])
                     }
                     systemTime++;
                 }
+                int size = sizeof processList / sizeof processList[0];
+                findavgTime(processList, size, burstTimeList);
             }
-            else if (strcmp(argv[1], "RR") == 0)
+            else if ((strcmp(argv[1], "RR") == 0) && (atoi(argv[2]) >= 1))
             {
+                int timeQuantum = atoi(argv[2]);
+                int rem_bt[length];
+                for (int i = 0; i < length; i++)
+                    rem_bt[i] = burstTimeList[i];
 
                 printf("RR algo %s\n", argv[1]);
+                printf("Time Quantum: %d\n", timeQuantum);
+
+                while (1)
+                {
+                    bool done = true;
+
+                    // Traverse all processes one by one repeatedly
+                    for (int i = 0; i < length; i++)
+                    {
+                        // If burst time of a process is greater than 0
+                        // then only need to process further
+                        if (rem_bt[i] > 0)
+                        {
+                            done = false; // There is a pending process
+
+                            if (rem_bt[i] > timeQuantum)
+                            {
+                                // Increase the value of t i.e. shows
+                                // how much time a process has been processed
+                                systemTime += timeQuantum;
+
+                                // Decrease the burst_time of current process
+                                // by quantum
+                                rem_bt[i] -= timeQuantum;
+                                printf("\n<System Time %d> process %d is running...\n", systemTime, ptr->process);
+                            }
+
+                            // If burst time is smaller than or equal to
+                            // quantum. Last cycle for this process
+                            else
+                            {
+                                // Increase the value of t i.e. shows
+                                // how much time a process has been processed
+                                systemTime = systemTime + rem_bt[i];
+
+                                // Waiting time is current time minus time
+                                // used by this process
+                                waitTimeList[i] = systemTime - burstTimeList[i];
+
+                                // As the process gets fully executed
+                                // make its remaining burst time = 0
+                                rem_bt[i] = 0;
+                            }
+                        }
+                    }
+
+                    // If all processes are done
+                    if (done == true)
+                        break;
+                }
             }
             else if (strcmp(argv[1], "SJF") == 0)
             {
@@ -163,8 +217,8 @@ int main(int argc, char *argv[])
     // for (int i = 0; i < 6; i++){
     //     printf("Process List array that will be passed into the average time function: %d  %d\n", processList[i],burstTimeList[i]);
     // }
-    int size = sizeof processList / sizeof processList[0];  
-    findavgTime(processList, size, burstTimeList);
+    // int size = sizeof processList / sizeof processList[0];
+    // findavgTime(processList, size, burstTimeList);
     printf("\n");
     fclose(input_file);
     return EXIT_SUCCESS;
