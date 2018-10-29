@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
     FILE *input_file;
 
-    input_file = fopen("input.1.txt", "r"); //read
+    input_file = fopen(argv[1], "r"); //read
 
     if (input_file == NULL)
     {
@@ -115,9 +115,7 @@ int main(int argc, char *argv[])
             burstTimeList[count] = ptr->burst;
             count++;
 
-            printf("%d %d %d\n", ptr->process, ptr->arrival, ptr->burst);
-
-            if (strcmp(argv[1], "FCFS") == 0)
+            if (strcmp(argv[2], "FCFS") == 0)
             {
 
                 int tempBurstTime = burstTime;
@@ -138,15 +136,18 @@ int main(int argc, char *argv[])
                 int size = sizeof processList / sizeof processList[0];
                 findavgTime(processList, size, burstTimeList);
             }
-            else if ((strcmp(argv[1], "RR") == 0) && (atoi(argv[2]) >= 1))
+            else if ((strcmp(argv[2], "RR") == 0) && (atoi(argv[3]) >= 1))
             {
                 int timeQuantum = atoi(argv[2]);
                 int rem_bt[length];
+                //map a new burst time array
                 for (int i = 0; i < length; i++)
                     rem_bt[i] = burstTimeList[i];
 
-                printf("RR algo %s\n", argv[1]);
+                printf("RR algo %s\n", argv[2]);
                 printf("Time Quantum: %d\n", timeQuantum);
+
+                int t = 0; // Current time
 
                 while (1)
                 {
@@ -161,15 +162,16 @@ int main(int argc, char *argv[])
                         {
                             done = false; // There is a pending process
 
-                            if (rem_bt[i] > timeQuantum)
+                            if (rem_bt[i] > t)
                             {
                                 // Increase the value of t i.e. shows
                                 // how much time a process has been processed
-                                systemTime += timeQuantum;
+                                t += timeQuantum;
 
                                 // Decrease the burst_time of current process
                                 // by quantum
-                                rem_bt[i] -= timeQuantum;
+                                rem_bt[i] -= t;
+                                systemTime++;
                                 printf("\n<System Time %d> process %d is running...\n", systemTime, ptr->process);
                             }
 
@@ -179,27 +181,32 @@ int main(int argc, char *argv[])
                             {
                                 // Increase the value of t i.e. shows
                                 // how much time a process has been processed
-                                systemTime = systemTime + rem_bt[i];
+                                t = t + rem_bt[i];
 
                                 // Waiting time is current time minus time
                                 // used by this process
-                                waitTimeList[i] = systemTime - burstTimeList[i];
+                                waitTimeList[i] = t - burstTimeList[i];
 
                                 // As the process gets fully executed
                                 // make its remaining burst time = 0
                                 rem_bt[i] = 0;
+                                systemTime++;
+                                printf("\n<System Time %d> process %d is finished\n", systemTime, ptr->process);
                             }
                         }
                     }
 
                     // If all processes are done
                     if (done == true)
+                    {
+                        printf("done");
                         break;
+                    }
                 }
             }
-            else if (strcmp(argv[1], "SJF") == 0)
+            else if (strcmp(argv[2], "SJF") == 0)
             {
-                printf("SJF algo %s\n", argv[1]);
+                printf("SJF algo %s\n", argv[2]);
             }
             else
             {
