@@ -76,6 +76,26 @@ void findavgTime(int processList[], int size, int burstTimeList[])
 void roundRobinAlgo()
 {
 }
+
+static void reverse(struct dataSection **head_ref)
+{
+    struct dataSection *prev = NULL;
+    struct dataSection *current = *head_ref;
+    struct dataSection *next = NULL;
+    while (current != NULL)
+    {
+        // Store next
+        next = current->next;
+
+        // Reverse current node's pointer
+        current->next = prev;
+
+        // Move pointers one position ahead.
+        prev = current;
+        current = next;
+    }
+    *head_ref = prev;
+}
 int main(int argc, char *argv[])
 {
 
@@ -118,57 +138,63 @@ int main(int argc, char *argv[])
             processList[count] = ptr->process;
             burstTimeList[count] = ptr->burst;
             count++;
-
-            if (strcmp(argv[2], "FCFS") == 0)
-            {
-
-                int tempBurstTime = burstTime;
-                while (tempBurstTime >= 0)
-                {
-                    if (tempBurstTime == 0)
-                    {
-                        printf("\n<System Time %d> process %d is finished!\n", systemTime, ptr->process);
-                        break;
-                    }
-                    else
-                    {
-                        printf("\n<System Time %d> process %d is running...\n", systemTime, ptr->process);
-                        tempBurstTime--;
-                    }
-                    systemTime++;
-                }
-                int size = sizeof processList / sizeof processList[0];
-                findavgTime(processList, size, burstTimeList);
-            }
-            else if ((strcmp(argv[2], "RR") == 0) && (atoi(argv[3]) >= 1))
-            {
-                int timeQuantum = atoi(argv[3]);
-                int rem_bt[length];
-                //map a new burst time array
-                for (int i = 0; i < length; i++)
-                    rem_bt[i] = burstTimeList[i];
-
-                printf("RR algo %s\n", argv[2]);
-                printf("Time Quantum: %d\n", timeQuantum);
-
-                roundRobinAlgo();
-            }
-            else if (strcmp(argv[2], "SJF") == 0)
-            {
-                printf("SJF algo %s\n", argv[2]);
-            }
-            else
-            {
-                perror("Error with input");
-            }
+            printf("Processes and BurstTime: %d  %d\n", ptr->process, ptr->burst);
         }
         else
         {
             printf("error reading input text, needs to be in a 3 colunm format");
         }
     }
-    printf("\n");
-    printf("\n");
+
+    if (strcmp(argv[2], "FCFS") == 0)
+    {
+        reverse(&ptr); //reverse linked list, was trversing backwards for some reason
+
+        while (ptr->next != NULL)
+        {
+            printf("Actaul order of LL Node being read: %d\n", ptr->process);
+            int tempBurstTime = ptr->burst;
+            while (tempBurstTime >= 0)
+            {
+                if (tempBurstTime == 0)
+                {
+                    printf("\n<System Time %d> process %d is finished!\n", systemTime, ptr->process);
+                    break;
+                }
+                else
+                {
+                    printf("\n<System Time %d> process %d is running...\n", systemTime, ptr->process);
+                    tempBurstTime--;
+                }
+                systemTime++;
+            }
+            ptr = ptr->next;
+        }
+        int size = sizeof processList / sizeof processList[0];
+        findavgTime(processList, size, burstTimeList);
+    }
+    else if ((strcmp(argv[2], "RR") == 0) && (atoi(argv[3]) >= 1))
+    {
+        int timeQuantum = atoi(argv[3]);
+        int rem_bt[length];
+        //map a new burst time array
+        for (int i = 0; i < length; i++)
+            rem_bt[i] = burstTimeList[i];
+
+        printf("RR algo %s\n", argv[2]);
+        printf("Time Quantum: %d\n", timeQuantum);
+
+        roundRobinAlgo();
+    }
+    else if (strcmp(argv[2], "SJF") == 0)
+    {
+        printf("SJF algo %s\n", argv[2]);
+    }
+    else
+    {
+        perror("Error with input");
+    }
+
     //calculate average here
     // for (int i = 0; i < 6; i++){
     //     printf("Process List array that will be passed into the average time function: %d  %d\n", processList[i],burstTimeList[i]);
