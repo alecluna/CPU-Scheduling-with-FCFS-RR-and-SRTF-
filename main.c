@@ -86,25 +86,55 @@ void roundRobinAlgo(struct dataSection **head_ref, int timeQuantum)
     }
 }
 
-static void reverse(struct dataSection **head_ref)
+static void reverse(struct dataSection **head)
 {
     struct dataSection *prev = NULL;
-    struct dataSection *current = *head_ref;
+    struct dataSection *current = *head;
     struct dataSection *next = NULL;
     while (current != NULL)
     {
-        // Store next
         next = current->next;
 
-        // Reverse current node's pointer
         current->next = prev;
 
-        // Move pointers one position ahead.
         prev = current;
         current = next;
     }
-    *head_ref = prev;
+    *head = prev;
 }
+/* swap data field of linked list */
+void swapBurst(struct dataSection *current, struct dataSection *min)
+{
+    struct dataSection *temp = current->burst;
+    current->burst = min->burst;
+    min->burst = temp;
+}
+void sortBurst(dataSection *head)
+{
+    dataSection *current = head;
+    dataSection *traverse;
+    dataSection *min;
+
+    while (current->next)
+    {
+        min = current;
+        traverse = current->next;
+
+        while (traverse)
+        {
+            /* Find minimum element from array */
+            if (min->burst > traverse->burst)
+            {
+                min = traverse;
+            }
+
+            traverse = traverse->next;
+        }
+        swapBurst(current, min); // Put minimum element on starting location
+        current = current->next;
+    }
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -137,10 +167,10 @@ int main(int argc, char *argv[])
         if (sscanf(str, "%d %d %d", &process, &arrivalTime, &burstTime) == 3)
         {
 
-            dataSection *temp;                                 //need a temp pointer to reference the next dataSection
-            temp = (dataSection *)malloc(sizeof(dataSection)); //otherwise we'd overwrite the current ptr's dataSection
-            temp->next = ptr;                                  //increment our linked list
-            ptr = temp;
+            dataSection *next;                                 //need a temp pointer to reference the next dataSection
+            next = (dataSection *)malloc(sizeof(dataSection)); //otherwise we'd overwrite the current ptr's dataSection
+            next->next = ptr;                                  //increment our linked list
+            ptr = next;
             ptr->process = process; //assign necessary variables
             ptr->arrival = arrivalTime;
             ptr->burst = burstTime;
@@ -198,7 +228,13 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[2], "SJF") == 0)
     {
+        //sortBurst(&ptr);
         printf("SJF algo %s\n", argv[2]);
+        while (ptr != NULL)
+        {
+            printf("Actaul order of LL Node being read: %d\n", ptr->burst);
+            ptr = ptr->next;
+        }
     }
     else
     {
