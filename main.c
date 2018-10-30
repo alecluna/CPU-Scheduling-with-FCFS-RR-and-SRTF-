@@ -3,7 +3,6 @@
 #include <math.h>
 #include <string.h>
 
-#define FILE_IN "input.1.txt"
 #define length 6
 typedef int bool;
 #define true 1
@@ -73,8 +72,18 @@ void findavgTime(int processList[], int size, int burstTimeList[])
     printf("Average turn around time = %d ", tat);
 }
 
-void roundRobinAlgo()
+void roundRobinAlgo(struct dataSection **head_ref, int timeQuantum)
 {
+    int systemTime;
+    struct dataSection *current = *head_ref;
+    while (current != NULL)
+    {
+
+        printf("\n<System Time %d> process %d is running... with Time Quantum %d\n", systemTime, current->process, timeQuantum);
+
+        current = current->next;
+        systemTime++;
+    }
 }
 
 static void reverse(struct dataSection **head_ref)
@@ -175,6 +184,7 @@ int main(int argc, char *argv[])
     }
     else if ((strcmp(argv[2], "RR") == 0) && (atoi(argv[3]) >= 1))
     {
+        reverse(&ptr);
         int timeQuantum = atoi(argv[3]);
         int rem_bt[length];
         //map a new burst time array
@@ -184,7 +194,7 @@ int main(int argc, char *argv[])
         printf("RR algo %s\n", argv[2]);
         printf("Time Quantum: %d\n", timeQuantum);
 
-        roundRobinAlgo();
+        roundRobinAlgo(&ptr, timeQuantum);
     }
     else if (strcmp(argv[2], "SJF") == 0)
     {
@@ -192,7 +202,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        perror("Error with input");
+        perror("Error with input or Time Quantum entered was less than 1");
     }
 
     //calculate average here
