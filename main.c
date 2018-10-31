@@ -19,6 +19,11 @@ typedef struct dataSection
 
 dataSection empty = {-1, -1, 0, NULL}; //initialize our empty struct
 
+struct Queue
+{
+    struct dataSection *front, *rear;
+};
+
 void findWaitingTime(int processList[], int size,
                      int burstTimeList[], int waitTimeList[])
 {
@@ -102,47 +107,22 @@ static void reverse(struct dataSection **head)
     }
     *head = prev;
 }
-/* swap data field of linked list */
-void swapBurst(struct dataSection *current, struct dataSection *min)
-{
-    struct dataSection *temp = current->burst;
-    current->burst = min->burst;
-    min->burst = temp;
-}
-void sortBurst(dataSection *head)
-{
-    dataSection *current = head;
-    dataSection *traverse;
-    dataSection *min;
-
-    while (current->next)
-    {
-        min = current;
-        traverse = current->next;
-
-        while (traverse)
-        {
-            /* Find minimum element from array */
-            if (min->burst > traverse->burst)
-            {
-                min = traverse;
-            }
-
-            traverse = traverse->next;
-        }
-        swapBurst(current, min); // Put minimum element on starting location
-        current = current->next;
-    }
-}
 
 int main(int argc, char *argv[])
 {
 
+    if (argc > 3) //error validate more than 4 args
+    {
+        printf("Incorrect number of arguments\n");
+        return 1;
+    }
     int process, arrivalTime, burstTime;
     int systemTime = 0;
     int count = 0;
+    int totalJobs = 0;
     char str[256];
     dataSection *ptr = NULL;
+    struct dataSection *n1, *n = NULL;
 
     int waitTimeList[length];
     int processList[length];
@@ -177,21 +157,24 @@ int main(int argc, char *argv[])
             processList[count] = ptr->process;
             burstTimeList[count] = ptr->burst;
             count++;
-            printf("Processes and BurstTime: %d  %d\n", ptr->process, ptr->burst);
+            totalJobs++;
         }
         else
         {
             printf("error reading input text, needs to be in a 3 colunm format");
         }
     }
+    fclose(input_file);
 
+    printf("Selected Algorithm: %s\n", argv[2]);
+    printf("Total %d tasks are read from \"%s\". press 'enter' to start...\n", totalJobs, input_file);
+    printf("==================================================================\n");
     if (strcmp(argv[2], "FCFS") == 0)
     {
         reverse(&ptr); //reverse linked list, was trversing backwards for some reason
 
         while (ptr->next != NULL)
         {
-            printf("Actaul order of LL Node being read: %d\n", ptr->process);
             int tempBurstTime = ptr->burst;
             while (tempBurstTime >= 0)
             {
@@ -204,42 +187,45 @@ int main(int argc, char *argv[])
                 {
                     printf("\n<System Time %d> process %d is running...\n", systemTime, ptr->process);
                     tempBurstTime--;
+                    systemTime++;
                 }
-                systemTime++;
             }
             ptr = ptr->next;
         }
-        int size = sizeof processList / sizeof processList[0];
-        findavgTime(processList, size, burstTimeList);
-    }
-    else if ((strcmp(argv[2], "RR") == 0) && (atoi(argv[3]) >= 1))
-    {
-        reverse(&ptr);
-        int timeQuantum = atoi(argv[3]);
-        int rem_bt[length];
-        //map a new burst time array
-        for (int i = 0; i < length; i++)
-            rem_bt[i] = burstTimeList[i];
+        printf("<system time %d> All processes finished....................\n", systemTime);
 
-        printf("RR algo %s\n", argv[2]);
-        printf("Time Quantum: %d\n", timeQuantum);
+        //findavgTime(processList, size, burstTimeList);
+    }
+    // else if ((strcmp(argv[2], "RR") == 0) && (atoi(argv[3]) >= 1))
+    // {
+    //     reverse(&ptr);
+    //     int timeQuantum = atoi(argv[3]);
+    //     int rem_bt[length];
+    //     //map a new burst time array
+    //     for (int i = 0; i < length; i++)
+    //         rem_bt[i] = burstTimeList[i];
 
-        roundRobinAlgo(&ptr, timeQuantum);
-    }
-    else if (strcmp(argv[2], "SJF") == 0)
-    {
-        //sortBurst(&ptr);
-        printf("SJF algo %s\n", argv[2]);
-        while (ptr != NULL)
-        {
-            printf("Actaul order of LL Node being read: %d\n", ptr->burst);
-            ptr = ptr->next;
-        }
-    }
-    else
-    {
-        perror("Error with input or Time Quantum entered was less than 1");
-    }
+    //     printf("RR algo %s\n", argv[2]);
+    //     printf("Time Quantum: %d\n", timeQuantum);
+
+    //     roundRobinAlgo(&ptr, timeQuantum);
+    // }
+    // else if (strcmp(argv[2], "SRTF") == 0)
+    // {
+    //     n1 = ptr = sortBurst(ptr);
+    //     sortBurst(ptr);
+
+    //     printf("SRTF algo %s\n", argv[2]);
+    //     while (ptr)
+    //     {
+    //         printf("Actual order of LL Node being read: %d  %d\n", ptr->process, ptr->burst);
+    //         ptr = ptr->next;
+    //     }
+    // }
+    // else
+    // {
+    //     perror("Error with input or Time Quantum entered was less than 1");
+    // }
 
     //calculate average here
     // for (int i = 0; i < 6; i++){
@@ -248,6 +234,5 @@ int main(int argc, char *argv[])
     // int size = sizeof processList / sizeof processList[0];
     // findavgTime(processList, size, burstTimeList);
     printf("\n");
-    fclose(input_file);
     return EXIT_SUCCESS;
 }
