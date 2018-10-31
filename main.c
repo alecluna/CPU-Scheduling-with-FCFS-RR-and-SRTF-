@@ -17,12 +17,63 @@ typedef struct dataSection
 
 } dataSection;
 
-dataSection empty = {-1, -1, 0, NULL}; //initialize our empty struct
-
-struct Queue
+typedef struct Queue
 {
     struct dataSection *front, *rear;
-};
+} Queue;
+
+// A utility function to create an empty queue
+struct Queue *createQueue()
+{
+    Queue *q = (Queue *)malloc(sizeof(Queue));
+    q->front = q->rear = NULL;
+    return q;
+}
+
+struct dataSection *newNode(int process, int arrival, int burst)
+{
+    dataSection *temp = (dataSection *)malloc(sizeof(dataSection));
+    temp->process = -1;
+    temp->arrival = -1;
+    temp->burst = -1;
+    temp->next = NULL;
+    return temp;
+}
+
+// The function to add a key k to q
+void enQueue(Queue *q, int process, int arrival, int burst)
+{
+    // Create a new LL node
+    dataSection *temp = newNode(process, arrival, burst);
+
+    // If queue is empty, then new node is front and rear both
+    if (q->rear == NULL)
+    {
+        q->front = q->rear = temp;
+        return;
+    }
+
+    // Add the new node at the end of queue and change rear
+    q->rear->next = temp;
+    q->rear = temp;
+}
+
+// Function to remove a key from given queue q
+struct dataSection *deQueue(Queue *q)
+{
+    // If queue is empty, return NULL.
+    if (q->front == NULL)
+        return NULL;
+
+    // Store previous front and move front one node ahead
+    dataSection *temp = q->front;
+    q->front = q->front->next;
+
+    // If front becomes NULL, then change rear also as NULL
+    if (q->front == NULL)
+        q->rear = NULL;
+    return temp;
+}
 
 void findWaitingTime(int processList[], int size,
                      int burstTimeList[], int waitTimeList[])
@@ -147,16 +198,16 @@ int main(int argc, char *argv[])
         if (sscanf(str, "%d %d %d", &process, &arrivalTime, &burstTime) == 3)
         {
 
-            dataSection *next;                                 //need a temp pointer to reference the next dataSection
-            next = (dataSection *)malloc(sizeof(dataSection)); //otherwise we'd overwrite the current ptr's dataSection
-            next->next = ptr;                                  //increment our linked list
-            ptr = next;
-            ptr->process = process; //assign necessary variables
-            ptr->arrival = arrivalTime;
-            ptr->burst = burstTime;
-            processList[count] = ptr->process;
-            burstTimeList[count] = ptr->burst;
-            count++;
+            Queue *q = createQueue();
+            enQueue(q, process, arrivalTime, burstTime);
+            dataSection *n = deQueue(q);
+            printf("Dequeued item is %d\n", n->burst);
+            // ptr->process = process; //assign necessary variables
+            // ptr->arrival = arrivalTime;
+            // ptr->burst = burstTime;
+            // processList[count] = ptr->process;
+            // burstTimeList[count] = ptr->burst;
+            // count++;
             totalJobs++;
         }
         else
@@ -169,33 +220,34 @@ int main(int argc, char *argv[])
     printf("Selected Algorithm: %s\n", argv[2]);
     printf("Total %d tasks are read from \"%s\". press 'enter' to start...\n", totalJobs, input_file);
     printf("==================================================================\n");
-    if (strcmp(argv[2], "FCFS") == 0)
-    {
-        reverse(&ptr); //reverse linked list, was trversing backwards for some reason
 
-        while (ptr->next != NULL)
-        {
-            int tempBurstTime = ptr->burst;
-            while (tempBurstTime >= 0)
-            {
-                if (tempBurstTime == 0)
-                {
-                    printf("\n<System Time %d> process %d is finished!\n", systemTime, ptr->process);
-                    break;
-                }
-                else
-                {
-                    printf("\n<System Time %d> process %d is running...\n", systemTime, ptr->process);
-                    tempBurstTime--;
-                    systemTime++;
-                }
-            }
-            ptr = ptr->next;
-        }
-        printf("<system time %d> All processes finished....................\n", systemTime);
+    // if (strcmp(argv[2], "FCFS") == 0)
+    // {
+    //     reverse(&ptr); //reverse linked list, was trversing backwards for some reason
 
-        //findavgTime(processList, size, burstTimeList);
-    }
+    //     while (ptr->next != NULL)
+    //     {
+    //         int tempBurstTime = ptr->burst;
+    //         while (tempBurstTime >= 0)
+    //         {
+    //             if (tempBurstTime == 0)
+    //             {
+    //                 printf("\n<System Time %d> process %d is finished!\n", systemTime, ptr->process);
+    //                 break;
+    //             }
+    //             else
+    //             {
+    //                 printf("\n<System Time %d> process %d is running...\n", systemTime, ptr->process);
+    //                 tempBurstTime--;
+    //                 systemTime++;
+    //             }
+    //         }
+    //         ptr = ptr->next;
+    //     }
+    //     printf("<system time %d> All processes finished....................\n", systemTime);
+
+    //     //findavgTime(processList, size, burstTimeList);
+    // }
     // else if ((strcmp(argv[2], "RR") == 0) && (atoi(argv[3]) >= 1))
     // {
     //     reverse(&ptr);
